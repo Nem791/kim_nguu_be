@@ -5,6 +5,8 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 const dotenv = require("dotenv");
 const cors = require("cors"); // ✅ Add this line
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
@@ -17,6 +19,11 @@ dotenv.config({ path: path.resolve(__dirname, `.env.${env}`) });
 
 var app = express();
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // limit each IP
+});
+
 // DB connection
 connectDB();
 
@@ -26,6 +33,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use(helmet());
+app.use(limiter);
+app.disable("x-powered-by");
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
