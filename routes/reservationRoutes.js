@@ -2,8 +2,21 @@ const express = require("express");
 const router = express.Router();
 const reservationController = require("../controllers/reservationController");
 
+const {
+  validateCreateReservation,
+  validateUpdateReservation,
+} = require("../validators/reservationValidator");
+
+const validate = require("../middleware/validate");
+const verifyToken = require("../middleware/verifyToken");
+
 // Create a reservation
-router.post("/", reservationController.createReservation);
+router.post(
+  "/",
+  validateCreateReservation,
+  validate,
+  reservationController.createReservation
+);
 
 // Get a single reservation by ID
 router.get("/:id", reservationController.getReservationById);
@@ -12,9 +25,15 @@ router.get("/:id", reservationController.getReservationById);
 router.get("/", reservationController.getReservations);
 
 // Update a reservation by ID
-router.put("/:id", reservationController.updateReservation);
+router.put(
+  "/:id",
+  verifyToken,
+  validateUpdateReservation,
+  validate,
+  reservationController.updateReservation
+);
 
 // Delete a reservation by ID
-router.delete("/:id", reservationController.deleteReservation);
+router.delete("/:id", verifyToken, reservationController.deleteReservation);
 
 module.exports = router;

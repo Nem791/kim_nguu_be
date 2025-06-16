@@ -8,27 +8,36 @@ const cors = require("cors"); // ✅ Add this line
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 
-var indexRouter = require("./routes/index");
-var usersRouter = require("./routes/users");
-var reservationRouter = require("./routes/reservationRoutes");
-const connectDB = require("./config/db");
-
 // Load env based on NODE_ENV
 const env = process.env.NODE_ENV || "development";
 dotenv.config({ path: path.resolve(__dirname, `.env.${env}`) });
+
+var indexRouter = require("./routes/index");
+var usersRouter = require("./routes/users");
+var reservationRouter = require("./routes/reservationRoutes");
+var adminAuthRouter = require("./routes/adminAuth");
+const connectDB = require("./config/db");
 
 var app = express();
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // limit each IP
+  max: 100, // limit each IP
 });
 
 // DB connection
 connectDB();
 
 app.use(logger("dev"));
-app.use(cors()); // ✅ Enable CORS for all routes
+
+// app.use(cors()); // ✅ Enable CORS for all routes
+app.use(
+  cors({
+    origin: "http://localhost:5173", // must be explicit
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -40,6 +49,7 @@ app.disable("x-powered-by");
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/reservations", reservationRouter);
+app.use("/admin", adminAuthRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
