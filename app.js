@@ -20,23 +20,38 @@ const connectDB = require("./config/db");
 
 var app = express();
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP
-});
-
 // DB connection
 connectDB();
 
 app.use(logger("dev"));
 
+const ADMIN_FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN;
 // app.use(cors()); // ✅ Enable CORS for all routes
 app.use(
   cors({
-    origin: process.env.FRONTEND_ORIGIN, // must be explicit
+    origin: ADMIN_FRONTEND_ORIGIN, // must be explicit
     credentials: true,
   })
 );
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: (req, res) => {
+    const origin = req.headers.origin || "";
+    // If request comes from admin origin, no limit
+    if (origin === ADMIN_FRONTEND_ORIGIN) {
+      return Infinity; // no limit for admin
+    }
+    return 100; // limit for others
+  },
+  keyGenerator: (req, res) => {
+    // Use origin as the key for rate limiting
+    return req.headers.origin || req.ip; // fallback to IP if no origin
+  },
+  handler: (req, res) => {
+    res.status(429).json({ message: "Too many requests" });
+  },
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

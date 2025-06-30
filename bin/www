@@ -23,12 +23,12 @@ app.set("port", port);
 
 var server = http.createServer(app);
 
-const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN;
+const ADMIN_FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN;
 
 // Create Socket.IO server and bind events
 var io = socketIo(server, {
   cors: {
-    origin: FRONTEND_ORIGIN,
+    origin: ADMIN_FRONTEND_ORIGIN,
     credentials: true,
     methods: ["GET", "POST"],
   },
