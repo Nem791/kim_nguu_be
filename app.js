@@ -33,7 +33,7 @@ app.use(logger("dev"));
 // app.use(cors()); // ✅ Enable CORS for all routes
 app.use(
   cors({
-    origin: "http://localhost:5173", // must be explicit
+    origin: process.env.FRONTEND_ORIGIN, // must be explicit
     credentials: true,
   })
 );
