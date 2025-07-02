@@ -1,5 +1,5 @@
 // models/Reservation.ts
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const ReservationSchema = new mongoose.Schema(
   {
@@ -87,4 +87,4 @@ ReservationSchema.pre("save", async function (next) {
   next();
 });
 
-export default mongoose.model("Reservation", ReservationSchema);
+module.exports = mongoose.model("Reservation", ReservationSchema);
