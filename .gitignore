@@ -61,3 +61,6 @@ pmm_logs/
 
 # Swagger files
 swagger-output.json
+
+CLAUDE.md
+.claude

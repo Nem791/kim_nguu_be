@@ -1,7 +1,7 @@
-const Reservation = require("../models/Reservation").default;
+const Reservation = require("../models/reservation");
 
 const bcrypt = require("bcrypt");
-const user = require("../models/user");
+const user = require("../models/User");
 /**
  * Create a new reservation
  * @param {Object} data - Reservation fields (e.g., name, phone, partySize, dateTime)
